@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { CalculatorTab, Language } from './types';
-import { translations } from './translations';
-import Header from './components/Header';
-import VolumeCalculator from './components/VolumeCalculator';
-import MurubbaToPiece from './components/MurubbaToPiece';
-import MeterToPiece from './components/MeterToPiece';
-import PieceToAll from './components/PieceToAll';
-import History from './components/History';
-import DeveloperInfo from './components/DeveloperInfo';
+import { CalculatorTab, Language } from './types.ts';
+import { translations } from './translations.ts';
+import Header from './components/Header.tsx';
+import VolumeCalculator from './components/VolumeCalculator.tsx';
+import MurubbaToPiece from './components/MurubbaToPiece.tsx';
+import MeterToPiece from './components/MeterToPiece.tsx';
+import PieceToAll from './components/PieceToAll.tsx';
+import History from './components/History.tsx';
+import DeveloperInfo from './components/DeveloperInfo.tsx';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<CalculatorTab>(CalculatorTab.VOLUME);

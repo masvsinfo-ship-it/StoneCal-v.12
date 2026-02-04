@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
-import { saveToHistory } from '../utils/storage';
-import { CalculatorTab } from '../types';
+import { saveToHistory } from '../utils/storage.ts';
+import { CalculatorTab } from '../types.ts';
 
 const VolumeCalculator: React.FC<{ t: any }> = ({ t }) => {
   const [length, setLength] = useState<string>('1');
