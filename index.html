@@ -5,27 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#00a651">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>পাথর ক্যালকুলেটর - কারিনা গ্রুপ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Hind Siliguri', sans-serif;
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         .app-card {
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
-            border-radius: 24px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 28px;
         }
         .input-box {
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            color: #006cb4;
+            border-radius: 14px;
+            color: #1e293b;
             font-weight: 700;
+            transition: all 0.2s;
+        }
+        .input-box:focus {
+            background-color: #fff;
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
         .vertical-bar {
             width: 5px;
@@ -34,32 +40,375 @@
             border-radius: 10px;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Smooth transitions for tabs */
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out;
+        .tab-active {
+            background-color: #00a651;
+            color: white;
+            box-shadow: 0 8px 20px -4px rgba(0, 166, 81, 0.3);
+            transform: scale(1.05);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .tab-inactive {
+            background-color: #fff;
+            color: #64748b;
+            border: 1px solid #f1f5f9;
         }
+        .animate-pop {
+            animation: pop 0.3s ease-out;
+        }
+        @keyframes pop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        [dir="rtl"] { text-align: right; }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "@google/genai": "https://esm.sh/@google/genai@1.39.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/"
-  }
-}
-</script>
 </head>
-<body>
-    <div id="root"></div>
-    <!-- Explicitly loading the entry point script -->
-    <script type="module" src="index.tsx"></script>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white px-6 pt-10 pb-6 sticky top-0 z-50 border-b border-slate-50">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-[#00a651] rounded-2xl flex items-center justify-center shadow-lg shadow-green-100">
+                    <span class="text-white text-2xl">💎</span>
+                </div>
+                <div>
+                    <h1 id="app-title" class="text-[#1e293b] font-bold text-xl leading-tight">পাথরের হিসাব</h1>
+                    <p id="group-name" class="text-slate-400 text-[10px] font-bold tracking-widest uppercase">কারিনা গ্রুপ</p>
+                </div>
+            </div>
+            
+            <select id="lang-selector" class="bg-slate-50 border border-slate-100 rounded-xl px-2 py-2 text-sm font-bold outline-none">
+                <option value="bn">🇧🇩 বাংলা</option>
+                <option value="en">🇺🇸 English</option>
+                <option value="hi">🇮🇳 हिन्दी</option>
+                <option value="ar">🇸🇦 العربية</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- Tab Bar -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-[108px] z-40 py-4 px-4 overflow-x-auto no-scrollbar border-b border-slate-50">
+        <div class="max-w-md mx-auto flex gap-3">
+            <button onclick="switchTab('volume')" id="tab-volume" class="flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl font-bold text-sm transition-all tab-active">
+                <span>📐</span> <span class="tab-text" data-key="volume">ভলিউম</span>
+            </button>
+            <button onclick="switchTab('murubba')" id="tab-murubba" class="flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl font-bold text-sm transition-all tab-inactive">
+                <span>🧱</span> <span class="tab-text" data-key="murubba">মুরুব্বা</span>
+            </button>
+            <button onclick="switchTab('meter')" id="tab-meter" class="flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl font-bold text-sm transition-all tab-inactive">
+                <span>📏</span> <span class="tab-text" data-key="meter">মিটার</span>
+            </button>
+            <button onclick="switchTab('piece')" id="tab-piece" class="flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl font-bold text-sm transition-all tab-inactive">
+                <span>🔢</span> <span class="tab-text" data-key="piece">পিস</span>
+            </button>
+            <button onclick="switchTab('history')" id="tab-history" class="flex items-center gap-2 whitespace-nowrap px-5 py-3 rounded-2xl font-bold text-sm transition-all tab-inactive">
+                <span>📜</span> <span class="tab-text" data-key="history">হিস্টোরি</span>
+            </button>
+        </div>
+    </nav>
+
+    <main id="content" class="flex-grow max-w-md mx-auto w-full px-5 py-8">
+        <!-- Forms will be injected here -->
+    </main>
+
+    <!-- Developer Footer -->
+    <div class="max-w-md mx-auto w-full px-5 pb-12">
+        <div class="p-8 bg-white rounded-[40px] border border-slate-100 shadow-sm text-center">
+            <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-inner rotate-3">
+                <span class="text-3xl">👨‍💻</span>
+            </div>
+            <h3 id="dev-title" class="text-slate-800 font-bold text-lg mb-1">ডেভেলপার যোগাযোগ</h3>
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-8">Built with ❤️ by Billal</p>
+            <div class="flex items-center justify-center gap-6">
+                <a href="https://fb.com/billal8795" target="_blank" class="w-14 h-14 flex items-center justify-center bg-[#1877F2] text-white rounded-full hover:scale-110 transition-all shadow-lg shadow-blue-200">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="https://wa.me/8801735308795" target="_blank" class="w-14 h-14 flex items-center justify-center bg-[#25D366] text-white rounded-full hover:scale-110 transition-all shadow-lg shadow-green-200">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white/30 py-3 text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+        Carina Group BD © 2024
+    </footer>
+
+    <script>
+        // State
+        let currentLang = localStorage.getItem('stone_lang') || 'bn';
+        let currentTab = 'volume';
+        let history = JSON.parse(localStorage.getItem('stone_calc_history') || '[]');
+
+        // Translations
+        const translations = {
+            bn: {
+                appName: 'পাথরের হিসাব',
+                groupName: 'কারিনা গ্রুপ',
+                calc: 'হিসাব করুন',
+                length: 'দৈর্ঘ্য (মি)',
+                width: 'প্রস্থ (মি)',
+                thickness: 'পুরুত্ব (সেমি)',
+                pieces: 'পিস',
+                murubba: 'মুরুব্বা',
+                meter: 'মিটার',
+                rateMur: 'দর (মুরুব্বা)',
+                rateMet: 'দর (মিটার)',
+                result: 'হিসাবের ফলাফল',
+                totalMur: 'মোট মুরুব্বা',
+                totalMet: 'মোট মিটার (লম্বা)',
+                totalPcs: 'মোট পিস',
+                priceMur: 'মুরুব্বা অনুযায়ী দাম',
+                priceMet: 'মিটার অনুযায়ী দাম',
+                totalVol: 'মোট ভলিউম (m³)',
+                optional: 'ঐচ্ছিক',
+                devTitle: 'ডেভেলপার যোগাযোগ',
+                history: 'হিস্টোরি',
+                clearHistory: 'সব মুছে ফেলুন',
+                noHistory: 'কোন হিস্টোরি পাওয়া যায়নি',
+                volume: 'ভলিউম'
+            },
+            en: {
+                appName: 'Stone Calculator',
+                groupName: 'Carina Group',
+                calc: 'Calculate',
+                length: 'Length (m)',
+                width: 'Width (m)',
+                thickness: 'Thickness (cm)',
+                pieces: 'Pieces',
+                murubba: 'Murubba',
+                meter: 'Meter',
+                rateMur: 'Rate (Murubba)',
+                rateMet: 'Rate (Meter)',
+                result: 'Result',
+                totalMur: 'Total Murubba',
+                totalMet: 'Total Meter',
+                totalPcs: 'Total Pieces',
+                priceMur: 'Price (Murubba)',
+                priceMet: 'Price (Meter)',
+                totalVol: 'Total Volume (m³)',
+                optional: 'Optional',
+                devTitle: 'Developer Contact',
+                history: 'History',
+                clearHistory: 'Clear All',
+                noHistory: 'No history found',
+                volume: 'Volume'
+            }
+        };
+
+        // UI Update Functions
+        function updateLocalization() {
+            const t = translations[currentLang] || translations.en;
+            document.getElementById('app-title').textContent = t.appName;
+            document.getElementById('group-name').textContent = t.groupName;
+            document.getElementById('dev-title').textContent = t.devTitle;
+            document.getElementById('lang-selector').value = currentLang;
+            
+            document.querySelectorAll('.tab-text').forEach(el => {
+                const key = el.getAttribute('data-key');
+                el.textContent = t[key];
+            });
+
+            document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            renderTab();
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('tab-inactive');
+            });
+            document.getElementById('tab-' + tabId).classList.add('tab-active');
+            document.getElementById('tab-' + tabId).classList.remove('tab-inactive');
+            renderTab();
+        }
+
+        function renderTab() {
+            const content = document.getElementById('content');
+            const t = translations[currentLang] || translations.en;
+            content.innerHTML = '';
+            
+            if (currentTab === 'history') {
+                renderHistory();
+                return;
+            }
+
+            // Forms
+            let formHtml = `
+                <div class="animate-pop">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="vertical-bar"></div>
+                        <h2 class="text-xl font-bold text-[#1e293b]">${t[currentTab]}</h2>
+                    </div>
+                    <div class="app-card bg-white p-6 border border-slate-100 mb-8">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-slate-500 text-[10px] font-bold uppercase">${t.length}</label>
+                                <input type="number" id="in-len" class="input-box w-full p-4" step="0.01" value="0.60">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-slate-500 text-[10px] font-bold uppercase">${t.width}</label>
+                                <input type="number" id="in-wid" class="input-box w-full p-4" step="0.01" value="0.30">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-slate-500 text-[10px] font-bold uppercase">${t.thickness}</label>
+                                <input type="number" id="in-thick" class="input-box w-full p-4" step="0.1" value="3.0">
+                            </div>
+                            ${getSpecificInput(currentTab, t)}
+                            <div class="space-y-1">
+                                <label class="text-slate-500 text-[10px] font-bold uppercase">${t.rateMur}</label>
+                                <input type="number" id="in-rate-mur" class="input-box w-full p-4" placeholder="${t.optional}">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-slate-500 text-[10px] font-bold uppercase">${t.rateMet}</label>
+                                <input type="number" id="in-rate-met" class="input-box w-full p-4" placeholder="${t.optional}">
+                            </div>
+                        </div>
+                        <button onclick="calculate()" class="w-full mt-6 bg-[#006cb4] text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-blue-100 active:scale-95 transition-all">
+                            ${t.calc} →
+                        </button>
+                    </div>
+                    <div id="result-area" class="space-y-4"></div>
+                </div>
+            `;
+            content.innerHTML = formHtml;
+        }
+
+        function getSpecificInput(tab, t) {
+            if (tab === 'volume') return `<div class="space-y-1"><label class="text-[#00a651] text-[10px] font-bold uppercase">${t.pieces}</label><input type="number" id="in-spec" class="input-box w-full p-4" value="1"></div>`;
+            if (tab === 'murubba') return `<div class="space-y-1"><label class="text-[#00a651] text-[10px] font-bold uppercase">${t.murubba}</label><input type="number" id="in-spec" class="input-box w-full p-4" value="25"></div>`;
+            if (tab === 'meter') return `<div class="space-y-1"><label class="text-[#00a651] text-[10px] font-bold uppercase">${t.meter}</label><input type="number" id="in-spec" class="input-box w-full p-4" value="25"></div>`;
+            if (tab === 'piece') return `<div class="space-y-1"><label class="text-[#00a651] text-[10px] font-bold uppercase">${t.pieces}</label><input type="number" id="in-spec" class="input-box w-full p-4" value="100"></div>`;
+        }
+
+        function calculate() {
+            const L = parseFloat(document.getElementById('in-len').value) || 0;
+            const W = parseFloat(document.getElementById('in-wid').value) || 0;
+            const T = parseFloat(document.getElementById('in-thick').value) || 0;
+            const Spec = parseFloat(document.getElementById('in-spec').value) || 0;
+            const RMur = parseFloat(document.getElementById('in-rate-mur').value) || 0;
+            const RMet = parseFloat(document.getElementById('in-rate-met').value) || 0;
+
+            let res = { murubba: 0, pieces: 0, meter: 0, vol: 0, priceMur: 0, priceMet: 0 };
+            const t = translations[currentLang] || translations.en;
+
+            if (currentTab === 'volume') {
+                res.murubba = L * W * Spec;
+                res.pieces = Spec;
+                res.meter = L * Spec;
+                res.vol = res.murubba * (T / 100);
+            } else if (currentTab === 'murubba') {
+                res.murubba = Spec;
+                res.pieces = Math.ceil(Spec / (L * W));
+                res.meter = res.pieces * L;
+            } else if (currentTab === 'meter') {
+                res.meter = Spec;
+                res.pieces = Math.ceil(Spec / L);
+                res.murubba = res.pieces * (L * W);
+            } else if (currentTab === 'piece') {
+                res.pieces = Spec;
+                res.murubba = Spec * (L * W);
+                res.meter = Spec * L;
+            }
+
+            res.priceMur = res.murubba * RMur;
+            res.priceMet = res.meter * RMet;
+
+            displayResult(res, t);
+            saveHistory(currentTab, { L, W, T, Spec }, res);
+        }
+
+        function displayResult(res, t) {
+            const area = document.getElementById('result-area');
+            area.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 animate-pop">
+                    <div class="bg-[#00a651] text-white p-6 rounded-3xl text-center shadow-lg shadow-green-100">
+                        <p class="text-[10px] font-bold uppercase mb-2 opacity-80">${t.totalMur}</p>
+                        <div class="text-3xl font-black">${res.murubba.toFixed(2)}</div>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-6 rounded-3xl text-center">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase mb-2">${t.totalPcs}</p>
+                        <div class="text-3xl font-black text-slate-800">${res.pieces}</div>
+                    </div>
+                    <div class="bg-white border border-slate-100 p-6 rounded-3xl text-center">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase mb-2">${t.totalMet}</p>
+                        <div class="text-3xl font-black text-slate-800">${res.meter.toFixed(2)}</div>
+                    </div>
+                    <div class="bg-slate-800 text-white p-6 rounded-3xl text-center">
+                        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">${t.totalVol}</p>
+                        <div class="text-2xl font-black">${(res.vol || 0).toFixed(3)}</div>
+                    </div>
+                    ${res.priceMur > 0 ? `<div class="col-span-2 bg-amber-500 text-white p-6 rounded-3xl text-center"><p class="text-[10px] font-bold uppercase mb-1 opacity-80">${t.priceMur}</p><div class="text-3xl font-black">${res.priceMur.toLocaleString()} ৳</div></div>` : ''}
+                    ${res.priceMet > 0 ? `<div class="col-span-2 bg-indigo-600 text-white p-6 rounded-3xl text-center"><p class="text-[10px] font-bold uppercase mb-1 opacity-80">${t.priceMet}</p><div class="text-3xl font-black">${res.priceMet.toLocaleString()} ৳</div></div>` : ''}
+                </div>
+            `;
+            area.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveHistory(tab, inputs, results) {
+            const item = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString(),
+                tab: tab,
+                inputs: inputs,
+                results: results
+            };
+            history.unshift(item);
+            if (history.length > 50) history.pop();
+            localStorage.setItem('stone_calc_history', JSON.stringify(history));
+        }
+
+        function renderHistory() {
+            const content = document.getElementById('content');
+            const t = translations[currentLang] || translations.en;
+            
+            let html = `
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="vertical-bar"></div>
+                        <h2 class="text-xl font-bold text-[#1e293b]">${t.history}</h2>
+                    </div>
+                    <button onclick="clearHistory()" class="text-[10px] font-bold text-red-500 uppercase bg-red-50 px-3 py-1.5 rounded-full border border-red-100">${t.clearHistory}</button>
+                </div>
+            `;
+
+            if (history.length === 0) {
+                html += `<div class="app-card bg-white p-12 text-center text-slate-400 font-bold">${t.noHistory}</div>`;
+            } else {
+                history.forEach(item => {
+                    html += `
+                        <div class="app-card bg-white p-5 border border-slate-100 mb-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[10px] font-black uppercase text-[#00a651] bg-green-50 px-2 py-0.5 rounded">${t[item.tab]}</span>
+                                <span class="text-[9px] text-slate-400">${item.timestamp}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <div class="text-xs text-slate-500">L:${item.inputs.L} W:${item.inputs.W} Spec:${item.inputs.Spec}</div>
+                                <div class="font-bold text-[#00a651]">${item.results.murubba.toFixed(2)} Mur</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            content.innerHTML = html;
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure?')) {
+                history = [];
+                localStorage.setItem('stone_calc_history', '[]');
+                renderHistory();
+            }
+        }
+
+        // Init
+        document.getElementById('lang-selector').addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            localStorage.setItem('stone_lang', currentLang);
+            updateLocalization();
+        });
+
+        updateLocalization();
+    </script>
 </body>
 </html>
