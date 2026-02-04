@@ -20,11 +20,19 @@ const GeminiAssistant: React.FC<Props> = ({ t, lang }) => {
 
   const askGemini = async () => {
     if (!prompt.trim()) return;
+
+    // Safety check for API Key availability
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      setResponse(lang === Language.BN ? 'সিস্টেম এরর: AI সার্ভিস কনফিগার করা নেই।' : 'System Error: AI service not configured.');
+      return;
+    }
+
     setLoading(true);
     setResponse('');
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       const languageMap = {
         [Language.BN]: 'Bengali',
         [Language.HI]: 'Hindi',
@@ -45,6 +53,7 @@ const GeminiAssistant: React.FC<Props> = ({ t, lang }) => {
       });
       setResponse(result.text || 'No response found.');
     } catch (error) {
+      console.error("Gemini Error:", error);
       setResponse(lang === Language.BN ? 'দুঃখিত, আবার চেষ্টা করুন।' : 'Sorry, please try again.');
     } finally {
       setLoading(false);
