@@ -1,3 +1,4 @@
+
 import { Language } from './types';
 
 export const translations = {
@@ -36,41 +37,6 @@ export const translations = {
       ai: 'AI'
     }
   },
-  [Language.EN]: {
-    appName: 'Stone Calculator',
-    groupName: 'Carina Group',
-    calc: 'Calculate',
-    length: 'Length (m)',
-    width: 'Width (m)',
-    thickness: 'Thickness (cm)',
-    pieces: 'Pieces',
-    murubba: 'Murubba',
-    meter: 'Meter',
-    rateMur: 'Rate (Murubba)',
-    rateMet: 'Rate (Meter)',
-    result: 'Result',
-    totalMur: 'Total Murubba',
-    totalMet: 'Total Meter',
-    totalPcs: 'Total Pieces',
-    priceMur: 'Price by Murubba',
-    priceMet: 'Price by Meter',
-    totalVol: 'Total Volume (m³)',
-    inputMur: 'Input Murubba',
-    optional: 'Optional',
-    devTitle: 'Developer Contact',
-    history: 'History',
-    clearHistory: 'Clear All',
-    noHistory: 'No history found',
-    delete: 'Delete',
-    tabs: {
-      volume: 'Volume',
-      murubba: 'Murubba',
-      meter: 'Meter',
-      piece: 'Piece',
-      history: 'History',
-      ai: 'AI'
-    }
-  },
   [Language.HI]: {
     appName: 'पत्थर गणना',
     groupName: 'करीना ग्रुप',
@@ -85,13 +51,13 @@ export const translations = {
     rateMet: 'दर (मीटर)',
     result: 'गणना परिणाम',
     totalMur: 'कुल मुरुब्बा',
-    totalMet: 'कुल मीटर',
+    totalMet: 'कुल मीटर (लंबाई)',
     totalPcs: 'कुल पीस',
     priceMur: 'मुरुब्बा के अनुसार मूल्य',
     priceMet: 'मीटर के अनुसार मूल्य',
     totalVol: 'कुल वॉल्यूम (m³)',
     inputMur: 'इनपुट मुरुब्बा',
-    optional: 'वैकल्पिक',
+    optional: 'वैकल्पিক',
     devTitle: 'डेवलपर संपर्क',
     history: 'इतिहास',
     clearHistory: 'सब साफ़ करें',
@@ -108,7 +74,7 @@ export const translations = {
   },
   [Language.AR]: {
     appName: 'حساب الحجر',
-    groupName: 'مجموعة كارينا',
+    groupName: 'مجموعة كاريনা',
     calc: 'احسب',
     length: 'الطول (م)',
     width: 'العرض (م)',
@@ -120,7 +86,7 @@ export const translations = {
     rateMet: 'السعر (للمتر)',
     result: 'نتيجة الحساب',
     totalMur: 'إجمالي المربع',
-    totalMet: 'إجمالي المتر',
+    totalMet: 'إجمالي المتر (طول)',
     totalPcs: 'إجمالي القطع',
     priceMur: 'السعر حسب المربع',
     priceMet: 'السعر حسب المتر',
@@ -138,6 +104,41 @@ export const translations = {
       meter: 'متر',
       piece: 'قطع',
       history: 'السجل',
+      ai: 'AI'
+    }
+  },
+  [Language.EN]: {
+    appName: 'Stone Calculator',
+    groupName: 'Carina Group',
+    calc: 'Calculate',
+    length: 'Length (m)',
+    width: 'Width (m)',
+    thickness: 'Thickness (cm)',
+    pieces: 'Pieces',
+    murubba: 'Murubba',
+    meter: 'Meter',
+    rateMur: 'Rate (Murubba)',
+    rateMet: 'Rate (Meter)',
+    result: 'Result',
+    totalMur: 'Total Murubba',
+    totalMet: 'Total Meter (Length)',
+    totalPcs: 'Total Pieces',
+    priceMur: 'Price by Murubba',
+    priceMet: 'Price by Meter',
+    totalVol: 'Total Volume (m³)',
+    inputMur: 'Input Murubba',
+    optional: 'Optional',
+    devTitle: 'Developer Contact',
+    history: 'History',
+    clearHistory: 'Clear All',
+    noHistory: 'No history found',
+    delete: 'Delete',
+    tabs: {
+      volume: 'Volume',
+      murubba: 'Murubba',
+      meter: 'Meter',
+      piece: 'Piece',
+      history: 'History',
       ai: 'AI'
     }
   }

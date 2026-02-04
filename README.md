@@ -1,31 +1,20 @@
-# পাথরের হিসাব - কারিনা গ্রুপ (Stone Calculator App)
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-এই অ্যাপ্লিকেশনটি পাথরের পরিমাপ (ভলিউম, মুরুব্বা, মিটার এবং পিস) নির্ভুলভাবে হিসাব করার জন্য তৈরি করা হয়েছে।
+# Run and deploy your AI Studio app
 
-## কিভাবে GitHub-এ আপলোড করবেন এবং লাইভ করবেন?
+This contains everything you need to run your app locally.
 
-আপনার অ্যাপটি লাইভ করার জন্য নিচের সহজ ধাপগুলো অনুসরণ করুন:
+View your app in AI Studio: https://ai.studio/apps/drive/1Q5HHgpJxRDLp0OyJJCo3J8viG6hgaOCp
 
-### ধাপ ১: GitHub Repository তৈরি করুন
-১. আপনার GitHub অ্যাকাউন্টে যান এবং একটি নতুন **Public Repository** তৈরি করুন (যেমন: `stone-calc-bd`)।
-২. আপনার কম্পিউটারের সব ফাইল সেখানে আপলোড করুন।
+## Run Locally
 
-### ধাপ ২: Vercel বা Netlify ব্যবহার করুন (সবচেয়ে সহজ)
-React অ্যাপগুলো GitHub Pages-এর চেয়ে **Vercel**-এ বেশি ভালো কাজ করে।
-১. [vercel.com](https://vercel.com/) এ যান এবং GitHub দিয়ে সাইন-ইন করুন।
-২. **Add New Project** ক্লিক করে আপনার Repository-টি সিলেক্ট করুন।
-৩. **Deploy** বাটনে ক্লিক করুন। 
-৪. ১ মিনিট পর আপনি একটি লাইভ লিঙ্ক পেয়ে যাবেন!
+**Prerequisites:**  Node.js
 
-### ধাপ ৩: GitHub Pages দিয়ে লাইভ করা (বিকল্প পদ্ধতি)
-যদি আপনি শুধু GitHub Pages ব্যবহার করতে চান:
-১. Repository-র **Settings** > **Pages**-এ যান।
-২. "Build and deployment" থেকে **GitHub Actions** সিলেক্ট করুন।
-৩. যেহেতু এটি একটি আধুনিক React/TSX অ্যাপ, এটি সরাসরি `.html` ফাইলের মতো কাজ করবে না। এটি চালাতে একটি Build step প্রয়োজন। উপরে দেওয়া **ধাপ ২ (Vercel)** পদ্ধতিটি ব্যবহার করার পরামর্শ দিচ্ছি।
 
-## গুরুত্বপূর্ণ তথ্য
-- **অফলাইন সাপোর্ট:** অ্যাপটি একবার লোড হলে অফলাইনেও কাজ করবে (LocalStorage ব্যবহার করা হয়েছে)।
-- **ডেভেলপার:** বিল্লাল (Billal)
-- **গ্রুপ:** কারিনা গ্রুপ (Carina Group)
-
-যেকোনো সমস্যার জন্য ডেভেলপার কন্টাক্ট সেকশনে দেওয়া লিঙ্কে যোগাযোগ করুন।
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
